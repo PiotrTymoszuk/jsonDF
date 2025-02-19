@@ -34,9 +34,10 @@ validation e.g, with \code{\link[jsonvalidate]{json_validate}}.
 \details{
 The input data frame has to have the following columns:
 \itemize{
-\item \code{variable}: variable name
+\item \code{variable}: unique variable names
 \item \code{enumeration}: unique values of the variable
-\item \code{coding}: coding for factor levels
+\item \code{coding}: coding for factor levels provided as a string of
+\code{value: label} pairs separated by semicolons
 \item \code{description}: description of a variable
 \item \code{json_expr}: ready-to-use variable properties as JSON Schema
 keyword: value pairs

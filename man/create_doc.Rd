@@ -30,10 +30,11 @@ it into an enumerated variable}
 \value{
 a data frame of class \code{documentation} with the following columns:
 \itemize{
-\item \code{variable}: variable name
+\item \code{variable}: unique variable name
 \item \code{type_r}: variable type compatible R
 \item \code{enumeration}: unique values of the variable
-\item \code{coding}: coding for factor levels
+\item \code{coding}: coding for factor levels provided as a string of \code{value: label}
+pairs separated by semicolons
 \item \code{description}: description of a variable, at the moment, it is a copy of
 \code{variable} column
 \item \code{json_expr}: ready-to-use string with variable properties as JSON Schema

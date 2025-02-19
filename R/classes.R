@@ -14,12 +14,18 @@
 #' @details
 #' The input data frame has to have the following columns:
 #'
-#' * `variable`: variable name
+#' * `variable`: unique variable names
+#'
 #' * `enumeration`: unique values of the variable
-#' * `coding`: coding for factor levels
+#'
+#' * `coding`: coding for factor levels provided as a string of
+#' `value: label` pairs separated by semicolons
+#'
 #' * `description`: description of a variable
+#'
 #' * `json_expr`: ready-to-use variable properties as JSON Schema
 #' keyword: value pairs
+#'
 #' * `required`: a logical that specifies if a variable is required
 #'
 #' Other, user-defined columns are possible.
@@ -53,6 +59,27 @@
                  "'description', 'json_expr', or 'required' is missing",
                  "from the data frame 'x'"),
            call. = FALSE)
+
+    }
+
+    if(sum(duplicated(x[['variable']])) > 0) {
+
+      stop("Duplicated variable names ('variable' column of 'x') not allowed",
+           call. = FALSE)
+
+    }
+
+    coding_present <- na.omit(x[['coding']])
+
+    if(length(coding_present > 0)) {
+
+      if(any(!stri_detect(coding_present, fixed = ':'))) {
+
+        stop(paste("Malformed coding detected. `value: label` pairs",
+                   "separated by semicolons are required"),
+             call. = FALSE)
+
+      }
 
     }
 

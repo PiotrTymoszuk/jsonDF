@@ -11,7 +11,7 @@ character_coding(x)
 }
 \value{
 a string with the following numbers of elements and the elements of \code{x}
-the \code{number: element}form.
+the \code{number: element} form separated by semicolons
 }
 \description{
 Creates a string with enumerated unique elements of the character vector.

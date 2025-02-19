@@ -28,6 +28,15 @@
   schema_json %>%
     write_schema('./inst/json_schemas/car_json_schema.json')
 
+  ## coding schemes with handling of parsing errors
+
+  car_documentation %>%
+    mutate(coding = ifelse(variable == 'Type', 'nonsense', coding)) %>%
+    create_coding(safely = TRUE)
+
+  my_cars %>%
+    create_coding
+
 # JSON files from data frames ----------
 
   #plan('multisession')

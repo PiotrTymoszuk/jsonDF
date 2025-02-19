@@ -15,9 +15,11 @@
 #' @importFrom purrr compact
 #' @importFrom purrr walk2
 #' @importFrom purrr pmap
+#' @importFrom purrr pmap_dfr
 #'
 #' @importFrom stringi stri_detect
 #' @importFrom stringi stri_replace_all
+#' @importFrom stringi stri_split_regex
 #'
 #' @importFrom rlang set_names
 #'

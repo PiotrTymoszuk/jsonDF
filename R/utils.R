@@ -9,8 +9,9 @@
 #'
 #' @param x a character vector.
 #'
-#' @return a string with the following numbers of elements and the elements of `x`
-#' the `number: element`form.
+#' @return
+#' a string with the following numbers of elements and the elements of `x`
+#' the `number: element` form separated by semicolons
 
   character_coding <- function(x) {
 
@@ -21,7 +22,7 @@
     paste(seq_along(unique_vals),
           unique_vals,
           sep = ": ",
-          collapse = ", ")
+          collapse = "; ")
 
   }
 
@@ -143,6 +144,88 @@
     inherits(x, 'Date') |
       inherits(x, 'POSIXct') |
       inherits(x, 'POSIXt')
+
+  }
+
+# Extractors for coding strings ----------
+
+#' Coding scheme from a coding string.
+#'
+#' @description
+#' The function takes a single character string of `value: label` pairs
+#' separated by semicolons and returns a list of `c(value, label)` tuples or
+#' a data frame with `value` and `label` columns.
+#'
+#' @details
+#' `value` is considered as a usually numeric value returned at the data base
+#' side, while `label` is meant as the label presented at the user's interface
+#' (for example in forms and views).
+#'
+#' @return a list of `c(value, label)` tuples or a data frame with
+#' `value` and `label` columns.
+#'
+#' @param x a character string as described in __Description__.
+#' @param as_data_frame logical: a data frame output?
+#' @param safely logical. If `safely = TRUE`, the function returns `NULL`
+#' with a warning if any parsing errors are encountered. Otherwise, an
+#' error is raised.
+#'
+#' @export
+
+  parse_coding <- function(x,
+                           as_data_frame = FALSE,
+                           safely = FALSE) {
+
+    ## input control ------
+
+    stopifnot(is.character(x))
+
+    if(length(x) > 1) {
+
+      warning("Only the first element of 'x' will be processed",
+              call. = FALSE)
+
+      x <- x[[1]]
+
+    }
+
+    stopifnot(is.logical(as_data_frame))
+    stopifnot(is.logical(safely))
+
+    ## processing the string -------
+
+    x_lst <- stri_split_regex(x, pattern = ';\\s{0,999}')[[1]]
+
+    x_lst <- stri_split_regex(x_lst, pattern = ':\\s{0,999}')
+
+    x_lens <- map_dbl(x_lst, length)
+
+    if(any(x_lens != 2)) {
+
+      error_cat <- which(x_lst != 2)
+
+      if(!safely) {
+
+        stop(paste('Parsing errors for the', error_cat, 'category'),
+             call. = FALSE)
+
+      } else {
+
+        warning(paste('Parsing problems for the', error_cat,
+                      'category. NULL is returned'),
+                call. = FALSE)
+
+        return(NULL)
+
+      }
+
+    }
+
+    x_lst <- map(x_lst, set_names, c('value', 'label'))
+
+    if(!as_data_frame) return(x_lst)
+
+    as.data.frame(reduce(x_lst, rbind))
 
   }
 

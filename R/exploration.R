@@ -26,14 +26,22 @@
 #' `documentation` objects.
 #'
 #' @return a data frame of class `documentation` with the following columns:
-#' * `variable`: variable name
+#'
+#' * `variable`: unique variable name
+#'
 #' * `type_r`: variable type compatible R
+#'
 #' * `enumeration`: unique values of the variable
-#' * `coding`: coding for factor levels
+#'
+#' * `coding`: coding for factor levels provided as a string of `value: label`
+#' pairs separated by semicolons
+#'
 #' * `description`: description of a variable, at the moment, it is a copy of
 #' `variable` column
+#'
 #' * `json_expr`: ready-to-use string with variable properties as JSON Schema
 #' keyword: value pairs
+#'
 #' * `required`: a logical indicating if a variable is required
 #'
 #' @examples

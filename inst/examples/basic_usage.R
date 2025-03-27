@@ -7,6 +7,11 @@
   library(jsonDF)
   library(furrr)
 
+# exploration of the `my_cars` data set -------
+
+  my_cars %>%
+    get_stats
+
 # documentation objects and JSON Schemas -------
 
   car_documentation <- my_cars %>%

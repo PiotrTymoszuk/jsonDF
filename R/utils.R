@@ -1,4 +1,153 @@
-# Non-exported utilities
+# Exported ad non-exported utilities
+
+# Tabulation tools -------
+
+#' Tabulate a vector: calculate frequency of elements.
+#'
+#' @description
+#' Function `tab()` computes frequencies and, optionaly, percentages of
+#' elements of a vector.
+#'
+#' @return
+#' If `as_vector = TRUE`, the function returns a vector with counts, percentages,
+#' or percentages and counts (general form: percentage % (n = )).
+#' If `as_vector = FALSE`, the function returns a single string with percentages,
+#' counts, and numbers of complete cases.
+#'
+#' @param x an atomic vector.
+#' @param type type of the output: counts, percentages, or percentages and
+#' counts. Defaults to counts and is ignored if `as_vector = FALSE`.
+#' @param as_vector logical, should a named vector of counts, percentages, or
+#' percentages and counts be returned?
+#' @param signif_digits number of significant digits to round the percentages.
+#' Used only if `as_vector = FALSE` or `type = 'both'`.
+#'
+#' @export
+
+  tab <- function(x,
+                  type = c('counts', 'percents', 'both'),
+                  as_vector = TRUE,
+                  signif_digits = 2) {
+
+    ## entry checks ----------
+
+    if(!is.atomic(x)) stop("'x' has to be an atomic vector", call. = FALSE)
+
+    type <- match.arg(type[1], c('counts', 'percents', 'both'))
+
+    stopifnot(is.logical(as_vector))
+
+    stopifnot(is.numeric(signif_digits))
+
+    signif_digits <- as.integer(signif_digits)
+
+    ## counts, percentages and both -------
+
+    counts <- table(x)
+
+    counts <- set_names(as.integer(counts), names(counts))
+
+    if(type == 'counts' & as_vector) return(counts)
+
+    percents <- counts/sum(counts) * 100
+
+    if(type == 'percents' & as_vector) return(percents)
+
+    percents <- signif(percents, signif_digits)
+
+    perc_str <-
+      map2_chr(percents, counts, ~paste0(.x, '% (n = ', .y, ')'))
+
+    if(type == 'both' & as_vector) return(perc_str)
+
+    ## returning a single string ------
+
+    complete_cases <- sum(counts)
+
+    if(length(counts) == 0) return(paste('complete: n =', complete_cases))
+
+    out_str <- map2_chr(names(counts), perc_str, paste, sep = ': ')
+
+    out_str <- paste(out_str, collapse = '\n')
+
+    paste(out_str, complete_cases, sep = '\ncomplete: n = ')
+
+  }
+
+#' Counts of unique elements in a vector.
+#'
+#' @description
+#' Counts of unique elements in an atomic vector.
+#'
+#' @return an integer with the number of unique elements.
+#'
+#' @param x an atomic vector.
+#'
+#' @export
+
+  n_unique <- function(x) length(table(x))
+
+# Statistics for numeric features and dates ---------
+
+#' Statistics for numeric features and dates.
+#'
+#' @description
+#' The function computes medians, interquartile ranges, and ranges for numeric
+#' vectors and dates.
+#'
+#' @return if `as_vector = TRUE` a numeric vector with the statistics is
+#' returned, otherwise a pre-formatted sting with the statistic names
+#' and values.
+#'
+#' @param x a numeric or date (Date, POSIXct, POSIXt, POSIXlt) vector
+#' @param as_vector logical, should a named vector of counts, percentages, or
+#' percentages and counts be returned?
+#' @param signif_digits number of significant digits to round the function's
+#' output. Use only if `as_vector = FALSE`
+#'
+#' @export
+
+  num_stats <- function(x, as_vector = FALSE, signif_digits = 2) {
+
+    ## input control ------
+
+    if(!is.atomic(x)) stop("'x' has to be an atomic vector", call. = FALSE)
+
+    if(!is.numeric(x) &
+       !inherits(x, 'Date') &
+       !inherits(x, 'POSIXt') &
+       !inherits(x, 'POSIXct') &
+       !inherits(x, 'POSIXlt')) {
+
+      stop("'x' has to be a numeric or date vector", call. = FALSE)
+
+    }
+
+    stopifnot(is.logical(as_vector))
+
+    stopifnot(is.numeric(signif_digits))
+
+    signif_digits <- as.integer(signif_digits[1])
+
+    all_na <- length(na.omit(x)) == 0
+
+    ## computation of the distribution stats -----
+
+    stats <- quantile(x, c(0.5, 0.25, 0.75, 0, 1), na.rm = TRUE)
+
+    stats <- set_names(stats, c('median', 'Q25', 'Q75', 'min', 'max'))
+
+    if(as_vector) return(stats)
+
+    if(is.numeric(x)) stats <- signif(stats, signif_digits)
+
+    stat_str <- paste0(stats[1], ' [IQR: ', stats[2], ' to ', stats[3], ']',
+                       '\nrange: ', stats[3], ' to ', stats[4],
+                       '\ncomplete: n = ', length(na.omit(x)))
+
+    stat_str
+
+  }
 
 # Enumeration tools -------
 

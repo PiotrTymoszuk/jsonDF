@@ -1,6 +1,185 @@
 # R toolbox for exploration of data frames and generation of
 # documentation data frames.
 
+
+# Descriptive statistics for columns of a data frame ---------
+
+#' Descriptive/exploratory statistics for a data frame.
+#'
+#' @description
+#' Function `get_stats()` computes descriptive statistics for columns of a data
+#' frame.
+#'
+#' @details
+#' For factors, enumerated character strings and enumerated numerical variables,
+#' percentages and counts of observations within the categories are returned
+#' along with the total numbers of complete observations.
+#' For numerical variables and dates, medians with interquartile ranges and
+#' ranges are computed.
+#'
+#' @return a data frame with the variable names (column `variable`),
+#' format (numeric, character, factor, date, column `format`) and descriptive
+#' statistics (column `statistic`, see Details).
+#'
+#' @param x a R data frame.
+#' @param variables a character vector with names of the variables to
+#' be analyzed. Defaults to all variables in the data frame.
+#' @param as_factor should character variables be returned to factors prior
+#' to computation of the statistics? Defaults to `TRUE`.
+#' @param enum_limit the maximum of unique values of the variables, which turns
+#' it into an enumerated variable.
+#' @param signif_digits number of significant digits used for rounding of
+#' the statistics.
+#' @param ... extra arguments, currently none.
+#'
+#' @export
+
+  get_stats <- function(x,
+                        variables = names(x),
+                        as_factor = TRUE,
+                        enum_limit = 10,
+                        signif_digits = 2, ...) {
+
+    ## input control --------
+
+    if(!is.data.frame(x)) stop("'x' has to be a data frame", call. = FALSE)
+
+    stopifnot(is.character(variables))
+
+    if(!all(variables %in% names(x))) {
+
+      stop("Some of the requested variables are absent from 'x'",
+           call. = FALSE)
+
+    }
+
+    stopifnot(is.logical(as_factor))
+
+    stopifnot(is.numeric(enum_limit))
+
+    enum_limit <- as.integer(enum_limit[1])
+
+    ## pre-processing --------
+
+    x <- x[variables]
+
+    var_classes <- map_chr(x, ~class(.x)[[1]])
+
+    x <-
+      map_dfc(x,
+              function(x) {
+
+                if(is.logical(x)) {
+
+                  return(factor(as.character(x), c('TRUE', 'FALSE')))
+
+                } else {
+
+                  return(x)
+
+                }
+
+              })
+
+
+    x <-
+      map_dfc(x,
+              function(x) {
+
+                if(!is.factor(x) & n_unique(x) <= enum_limit) {
+
+                  return(factor(x))
+
+                } else {
+
+                  return(x)
+
+                }
+
+              })
+
+    char_variables <- map_lgl(x, is.character)
+    fct_variables <- map_lgl(x, is.factor)
+    num_variables <- map_lgl(x,
+                             function(x) {
+
+                               is.numeric(x) |
+                                 inherits(x, 'Date') |
+                                 inherits(x, 'POSIXt') |
+                                 inherits(x, 'POSIXct') |
+                                 inherits(x, 'POSIXlt')
+
+                             })
+
+    ## computation of the stats -------
+
+    fct_metrics <- list()
+
+    if(sum(fct_variables) > 0) {
+
+      fct_metrics <-
+        map(x[fct_variables],
+            tab,
+            type = 'both',
+            as_vector = FALSE,
+            signif_digits = signif_digits)
+
+      fct_metrics <- set_names(fct_metrics,
+                               names(fct_variables)[fct_variables])
+
+    }
+
+    num_metrics <- list()
+
+    if(sum(num_variables) > 0) {
+
+      num_metrics <-
+        map(x[num_variables],
+            num_stats,
+            as_vector = FALSE,
+            signif_digits = signif_digits)
+
+      num_metrics <- set_names(num_metrics,
+                               names(num_variables)[num_variables])
+
+    }
+
+    char_metrics <- list()
+
+    if(sum(char_variables) > 0) {
+
+      char_metrics <-
+        map(x[char_variables],
+            ~paste('complete: n =',
+                   length(na.omit(x))))
+
+      char_metrics <- set_names(char_metrics,
+                                names(char_variables)[char_variables])
+
+    }
+
+    ## the output -------
+
+    out_df <- c(fct_metrics, num_metrics, char_metrics)
+
+    variables <- droplevels(factor(names(out_df), variables))
+
+    variable <- NULL
+    statistic <- NULL
+    format <- NULL
+
+    out_df <-
+      tibble(variable = variables,
+             format = var_classes[variables],
+             statistic = as.character(out_df))
+
+    arrange(out_df, variable)
+
+  }
+
+
+# Documentation for a data frame -------
+
 #' Create a backbone documentation for a data frame.
 #'
 #' @description

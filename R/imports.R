@@ -2,6 +2,8 @@
 
 #' @importFrom dplyr tibble
 #' @importFrom dplyr left_join
+#' @importFrom dplyr arrange
+#' @importFrom dplyr filter
 #'
 #' @importFrom readr write_file
 #'
@@ -28,6 +30,7 @@
 #' @importFrom jsonlite toJSON
 #'
 #' @importFrom stats na.omit
+#' @importFrom stats quantile
 #'
 #' @importFrom furrr future_map
 #' @importFrom furrr future_map2_lgl

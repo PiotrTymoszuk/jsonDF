@@ -151,7 +151,7 @@
       char_metrics <-
         map(x[char_variables],
             ~paste('complete: n =',
-                   length(na.omit(x))))
+                   length(na.omit(.x))))
 
       char_metrics <- set_names(char_metrics,
                                 names(char_variables)[char_variables])

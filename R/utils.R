@@ -142,7 +142,7 @@
     if(is.numeric(x)) stats <- signif(stats, signif_digits)
 
     stat_str <- paste0(stats[1], ' [IQR: ', stats[2], ' to ', stats[3], ']',
-                       '\nrange: ', stats[3], ' to ', stats[4],
+                       '\nrange: ', stats[4], ' to ', stats[5],
                        '\ncomplete: n = ', length(na.omit(x)))
 
     stat_str

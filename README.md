@@ -3,11 +3,13 @@ Conversions Between R Data Frames, JSON Schemas, JSON data files, and SQL code
 
 ## Summary 
 
-Facilitates generation of JSON Schemas and JSON data files from user's documentation and R data frames. Provides tools for generation of simulated data and SQL code based on a JSON Schema.
+Facilitates generation of JSON Schemas and JSON data files from user's documentation and R data frames. 
+Provides tools for documenting, generation of JSON Schemas, validation, and generation of SQL code based on R data frames.
 
 ## Remarks
 
-Working on SQL code generators and tools for simulation of data frame entries given a JSON Schema. The `data.frame` - `JSON` - `JSON Schema` conversion tools are more or less ready.
+Working on SQL code generators and tools for simulation of data frame entries given a JSON Schema. 
+The `data.frame` - `JSON` - `JSON Schema`, `data.frame` - `documentation` - `documentation Markdowm/HTML` conversion tools are more or less ready.
 
 ## Terms of use
 

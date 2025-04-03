@@ -142,7 +142,8 @@
 #'
 #' @param x a data frame or a list of JSON data objects
 #' (\code{\link{json_data}} object)
-#' @param path path to the folder where JSON data files will be saved
+#' @param path path to the folder where JSON data files will
+#' be saved
 #' @param names_from name of a variable in `x`, which specifies a unique
 #' identifier used as names of the output list. If `names_from = '.rownames'`,
 #' row names of x will be used. If `names_from = NULL`, the output list will

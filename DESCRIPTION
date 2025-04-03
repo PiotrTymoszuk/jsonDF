@@ -2,15 +2,16 @@ Package: jsonDF
 Type: Package
 Title: Conversions Between R Data Frames, JSON Schemas, JSON data files, 
     and SQL code
-Version: 1.0.1
+Version: 1.2.0
 Authors@R: c(
     person("Piotr", "Tymoszuk", , "piotr.s.tymoszuk@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0398-6034"))
   )
 Description: Facilitates generation of JSON Schemas and JSON data files from 
-    user's documentation and R data frames. Provides tools for generation of 
-    simulated data and SQL code based on a JSON Schema.
-License: GPL-3
+    user's documentation and R data frames. Provides tools for documenting, 
+    generation of JSON Schemas, validation, and generation of SQL code based on 
+    R data frames.
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2

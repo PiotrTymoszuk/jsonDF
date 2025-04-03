@@ -16,7 +16,8 @@ write_json_data(x, path, ...)
 \item{x}{a data frame or a list of JSON data objects
 (\code{\link{json_data}} object)}
 
-\item{path}{path to the folder where JSON data files will be saved}
+\item{path}{path to the folder where JSON data files will
+be saved}
 
 \item{...}{arguments passed to methods and to \code{\link[jsonlite]{toJSON}}}
 

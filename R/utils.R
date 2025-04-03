@@ -1,4 +1,4 @@
-# Exported ad non-exported utilities
+# General exported ad non-exported utilities
 
 # Tabulation tools -------
 
@@ -264,7 +264,7 @@
 
     }
 
-    ## an uunboxed JSON data string
+    ## an unboxed JSON data string
 
     json_str <- toJSON(x[idx, , drop = FALSE], ...)
 

@@ -61,8 +61,11 @@ Required columns are inferred with a simple heuristics: if there are no
 Of note, the \code{documentation} class data frame returned by the function can
 be modified by the user just as a very normal data frame. In particular,
 it is possible to modify and append JSON Schema expressions per hand.
-See also: \code{\link{build_schema}} functions for building JSON Schemas from
-\code{documentation} objects.
+See also:
+\code{\link{build_schema}} functions for building JSON Schemas from
+\code{documentation} objects, and \code{\link{render_doc}} and
+\code{\link{toDocument.documentation}} for creating markdown and HTML documents
+with variable documentation.
 }
 \examples{
 create_doc(my_cars)

@@ -4,7 +4,10 @@
 # packages -------
 
   library(tidyverse)
+  library(stringi)
+
   library(jsonDF)
+
   library(furrr)
 
 # exploration of the `my_cars` data set -------
@@ -14,14 +17,26 @@
 
 # documentation objects and JSON Schemas -------
 
+  ## documentation object enriched with custom information
+
   car_documentation <- my_cars %>%
-    create_doc
+    create_doc %>%
+    mutate(variable_class = ifelse(stri_detect(variable, regex = 'Price|MPG'),
+                                   'affordability', 'other'))
 
   schema_string <- car_documentation %>%
     build_schema
 
   schema_json <- car_documentation %>%
     build_schema(as_schema = TRUE)
+
+  ## rendering documentation as markdown or HTML documents
+
+  car_documentation %>%
+    toDocument(title = 'Documentation of MyCard data set',
+               subtitle = 'Variable lexicon',
+               type = 'markdown',
+               sep = '<hr>')
 
   ## or a shortcut
 

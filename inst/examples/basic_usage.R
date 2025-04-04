@@ -113,32 +113,26 @@
                heading_levels = c(2, 3),
                file = 'variable_lexicon.html')
 
+  ## creating a coding scheme/list-of-values
+
+  car_coding_scheme <- my_cars %>%
+    create_coding
+
 # Construction of JSON Schemas -----
 
-  schema_string <- car_documentation %>%
-    build_schema
+  ## creating
 
   schema_json <- car_documentation %>%
-    build_schema(as_schema = TRUE)
+    build_schema(as_schema = TRUE,
+                 description_extras = c('coding', 'unit'))
 
-  ## or a shortcut
-
-  my_cars %>%
-    build_schema(as_json = FALSE)
+  schema_string <- car_documentation %>%
+    build_schema(description_extras = c('coding', 'unit'))
 
   ## saving a JSON files with the Schema
 
   schema_json %>%
     write_schema('./inst/json_schemas/car_json_schema.json')
-
-  ## coding schemes with handling of parsing errors
-
-  car_documentation %>%
-    mutate(coding = ifelse(variable == 'Type', 'nonsense', coding)) %>%
-    create_coding(safely = TRUE)
-
-  my_cars %>%
-    create_coding
 
 # JSON files from data frames ----------
 

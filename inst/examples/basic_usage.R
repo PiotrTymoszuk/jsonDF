@@ -168,17 +168,12 @@
 
   json_data_lst <- my_cars %>%
     df2json(names_from = 'ID',
+            json_factor = 'integer',
+            json_date = 'date-time',
             as_list = TRUE)
 
   json_data_lst %>%
     write_json_data(path = './inst/json_data')
-
-  ## a JSON data list with factors coded as strings
-
-  json_data_fctstr_lst <- my_cars %>%
-    df2json(names_from = 'ID',
-            json_factor = 'string',
-            as_list = TRUE)
 
 # Validation of JSON data lists with JSON data schemes ---------
 
@@ -187,15 +182,6 @@
   plan('multisession')
 
   json_valid_results <-
-    validate_json_data(schema = schema_json,
-                     json_data_lst)
-
-  ## validation of JSON data with factors coded as strings: failed
-
-  plan('multisession')
-
-  json_valid_fctstr_results <-
-    validate_json_data(schema = schema_json,
-                       json_data_fctstr_lst)
+    validate_json_data(schema = schema_json, data = json_data_lst)
 
 # END ------

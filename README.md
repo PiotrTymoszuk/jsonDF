@@ -23,6 +23,17 @@ The package is being developed in collaboration with [Health Data Research Hub a
 
 The package maintainer is [Piotr Tymoszuk](mailto:piotr.s.tymoszuk@gmail.com).
 
+## Acknowledgements
+
+We thank authors, maintainers, and contributions of the following R packages: 
+[tidyverse](https://www.tidyverse.org/), 
+[furrr](https://furrr.futureverse.org/), 
+[future](https://future.futureverse.org/), 
+[jsonlite](https://github.com/jeroen/jsonlite), 
+[jsonvalidate](https://github.com/ropensci/jsonvalidate), 
+[rlang](https://rlang.r-lib.org/), and 
+[stringi](https://stringi.gagolewski.com/index.html). 
+
 ## Basic usage
 
 To demonstrate basic functions of the package, a derivative of the `Cars93` data set from `MASS` package will be used. 
@@ -435,6 +446,89 @@ Finally, with `write_schema()`, the JSON Schema can by saved on a disc.
 
 ```
 <img src="inst/screenshots/json_schema.PNG" style="width: 75%;" alt="JSON Schema">
+
+</details>
+
+### JSON data files and validation
+
+<details>
+
+#### Saving data frame as JSON data files 
+
+JSON emerges as a format for shipping and storing structured data. 
+With function `df2json()` most R data frames can be converted to a list of JSON objects, with single objects corresponding to the data frame's rows. 
+As shown below, we convert `my_cars` data set to a list of JSON objects, with elements corresponding to single car models and named after their unique identifier stored as `ID` variables. 
+By setting `json_factor = 'integer'`, any R factors will be re-coded to integers, where the first levels is turned to 1, the second level to 2, and so on. 
+`json_date = 'date-time'` coerces date variables to the [ISO 8601 format](https://www.iso.org/iso-8601-date-and-time-format.html). 
+
+```r 
+
+  json_data_lst <- my_cars %>%
+    df2json(names_from = 'ID',
+            json_factor = 'integer',
+            json_date = 'date-time',
+            as_list = TRUE)
+
+```
+
+```
+> json_data_lst$Acura_Integra[1:5]
+
+$ID
+[1] "Acura_Integra"
+
+$Manufacturer
+[1] "Acura"
+
+$Model
+[1] "Integra"
+
+$Type
+[1] 4
+
+$Min.Price
+[1] 12.9
+
+```
+
+The list elements will be saved on the disc by calling `write_json_data()`: 
+
+```r
+
+  json_data_lst %>%
+      write_json_data(path = './inst/json_data')
+
+```
+
+#### Validation with JSON Schemas
+
+Validation of JSON data objects with JSON Schemes is accomplished with so called JSON validators. 
+In our `jsonDF` package we re-implement the toolbox of [jsonvalidate](https://github.com/ropensci/jsonvalidate) and [AJV validation engine](https://ajv.js.org/) in the wrapper function `validate_json_data()`. 
+In the example of validation of the JSON object list from `my_cars` data set (`data` argument), we use the previously created schema (`schema`). 
+By declaring `plan('multisession')`, we allow the validator to run in parallel, which makes the validation complete within seconds. 
+The validation results are returned as a vector of logical values named after elements of the JSON object list. 
+
+```r
+
+  plan('multisession')
+  
+    json_valid_results <-
+      validate_json_data(schema = schema_json, data = json_data_lst)
+
+```
+```
+> json_valid_results[1:20]
+
+       Acura_Integra         Acura_Legend              Audi_90             Audi_100             BMW_535i        Buick_Century 
+                TRUE                 TRUE                 TRUE                 TRUE                 TRUE                 TRUE 
+       Buick_LeSabre     Buick_Roadmaster        Buick_Riviera     Cadillac_DeVille     Cadillac_Seville   Chevrolet_Cavalier 
+                TRUE                 TRUE                 TRUE                 TRUE                 TRUE                 TRUE 
+   Chevrolet_Corsica     Chevrolet_Camaro     Chevrolet_Lumina Chevrolet_Lumina_APV      Chevrolet_Astro    Chevrolet_Caprice 
+                TRUE                 TRUE                 TRUE                 TRUE                 TRUE                 TRUE 
+  Chevrolet_Corvette    Chrylser_Concorde 
+                TRUE                 TRUE 
+
+```
 
 </details>
 

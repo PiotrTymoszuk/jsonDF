@@ -55,8 +55,7 @@ Package `furrr` will parallelize some validation steps.
 
 ```
 
-
-### Exploratory analysis and documentation of variables in a data frame 
+### Exploratory analysis and documantation of variables in a data frame 
 
 <details>
 

@@ -326,6 +326,130 @@ Such ready-to-use lists of values can be easily extracted from `documentation` o
 
 </details>
 
+### Managing variable tags in data frame documentation 
+
+<details>
+
+Assigning tags to variables is an easy way to implement custom classifications of metadata. 
+The functionality of assigning, removing, and displaying tags of variables in `documentation` objects is implemented by functions `add_tags()`, `delete_tags()`, and `show_tags()`, respectively. 
+The tags are manipulated for variables selected from the documentation by one or more logical statements/criteria; as such this behavior is analogous to function `filter()` from the `tidyverse` toolbox. 
+
+In our example, we are appending the documentation of `my_cars` data set with tags for all descriptive variables (`root tag`), 
+tags coding for affordability, car's price, cars' characteristic, dimensions, and engine data. 
+These tags are stored as character vectors in the `tags` column of the data frame's documentation. 
+
+```r
+
+  ## adding variable tags
+  
+  car_documentation <- car_documentation %>%
+      add_tags(tags = 'root tag') %>%
+      add_tags(tags = c('price', 'affordability'),
+               stri_detect(variable, regex = 'Price$')) %>%
+      add_tags(tags = c('economics', 'affordability'),
+               stri_detect(variable, regex = '^MPG')) %>%
+      add_tags(tags = c('characteristic', 'dimensions'),
+               variable %in% c('Passengers',
+                               'Length',
+                               'Width',
+                               'Wheelbase',
+                               'Turn.circle',
+                               'Luggage.room',
+                               'Rear.seat.room')) %>%
+      add_tags(tags = c('characteristic', 'drive'),
+               variable %in% c('DriveTrain',
+                               'Cylinders',
+                               'EngineSize',
+                               'Horsepower',
+                               'RPM',
+                               'Rev.per.mile',
+                               'Man.trans.avail'))
+                               
+  ## and removing the `root tag` for non-descriptive variables
+
+  car_documentation <- car_documentation %>%
+    delete_tags(tags = 'root tag',
+                variable %in% c('ID', 'Type'))
+
+```
+
+```
+> car_documentation %>% select(variable, tags) %>% mutate(tags = map_chr(tags, paste, collapse = ', '))
+
+# A tibble: 31 × 2
+   variable     tags                                
+   <chr>        <chr>                               
+ 1 ID           ""                                  
+ 2 Manufacturer "root tag"                          
+ 3 Model        "root tag"                          
+ 4 Type         ""                                  
+ 5 Min.Price    "root tag, price, affordability"    
+ 6 Price        "root tag, price, affordability"    
+ 7 Max.Price    "root tag, price, affordability"    
+ 8 MPG.city     "root tag, economics, affordability"
+ 9 MPG.highway  "root tag, economics, affordability"
+10 AirBags      "root tag"                          
+# … with 21 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+> car_documentation %>% show_tags
+
+[1] "root tag"       "price"          "affordability"  "economics"      "characteristic" "drive"          "dimensions"   
+
+```
+
+The documentation can be filtered via full-text matches between the tags in the documentation and a query using `filter_tags()` function. 
+The matching behavior is orchestrated by the `mode` argument: 
+for `mode = 'all'`, the complete match between the query (provided as `tags` argument) and the tags in the documentation serves as the selection criterion, 
+for `mode = 'any'`, the selection criterion is at least one shared element between the query and the tags in the documentation. 
+This is illustrated for searching the documentation of `my_cars`: 
+
+```
+> car_documentation %>%
++     filter_tags(tags = c('characteristic', 'drive'),
++                 mode = 'all')
+
+# A tibble: 7 × 9
+  variable        type_r  enumeration      coding                                  description         json_…¹ requi…² unit  tags 
+  <chr>           <chr>   <chr>            <chr>                                   <chr>               <chr>   <lgl>   <chr> <lis>
+1 DriveTrain      factor  1, 2, 3          1: 4WD; 2: Front; 3: Rear               Drive transmission  "\"typ… TRUE    NA    <chr>
+2 Cylinders       factor  1, 2, 3, 4, 5, 6 1: 3; 2: 4; 3: 5; 4: 6; 5: 8; 6: rotary Cylinder number an… "\"typ… TRUE    NA    <chr>
+3 EngineSize      numeric NA               NA                                      Engine volume       "\"typ… TRUE    lite… <chr>
+4 Horsepower      integer NA               NA                                      Engine power        "\"typ… TRUE    HP    <chr>
+5 RPM             integer NA               NA                                      Optimal rotation s… "\"typ… TRUE    NA    <chr>
+6 Rev.per.mile    integer NA               NA                                      Revolutions per mi… "\"typ… TRUE    revo… <chr>
+7 Man.trans.avail factor  1, 2             1: No; 2: Yes                           Availability of ma… "\"typ… TRUE    NA    <chr>
+# … with abbreviated variable names ¹​json_expr, ²​required
+
+```
+```
+> car_documentation %>%
++     filter_tags(tags = c('characteristic', 'drive'),
++                 mode = 'any')
+
+# A tibble: 14 × 9
+   variable        type_r  enumeration      coding                                  description        json_…¹ requi…² unit  tags 
+   <chr>           <chr>   <chr>            <chr>                                   <chr>              <chr>   <lgl>   <chr> <lis>
+ 1 DriveTrain      factor  1, 2, 3          1: 4WD; 2: Front; 3: Rear               Drive transmission "\"typ… TRUE    NA    <chr>
+ 2 Cylinders       factor  1, 2, 3, 4, 5, 6 1: 3; 2: 4; 3: 5; 4: 6; 5: 8; 6: rotary Cylinder number a… "\"typ… TRUE    NA    <chr>
+ 3 EngineSize      numeric NA               NA                                      Engine volume      "\"typ… TRUE    lite… <chr>
+ 4 Horsepower      integer NA               NA                                      Engine power       "\"typ… TRUE    HP    <chr>
+ 5 RPM             integer NA               NA                                      Optimal rotation … "\"typ… TRUE    NA    <chr>
+ 6 Rev.per.mile    integer NA               NA                                      Revolutions per m… "\"typ… TRUE    revo… <chr>
+ 7 Man.trans.avail factor  1, 2             1: No; 2: Yes                           Availability of m… "\"typ… TRUE    NA    <chr>
+ 8 Passengers      integer 2, 4, 5, 6, 7, 8 NA                                      Number of passeng… "\"typ… TRUE    NA    <chr>
+ 9 Length          integer NA               NA                                      Length of the car  "\"typ… TRUE    inch… <chr>
+10 Wheelbase       integer NA               NA                                      Wheelbase of the … "\"typ… TRUE    inch… <chr>
+11 Width           integer NA               NA                                      Width of the car   "\"typ… TRUE    inch… <chr>
+12 Turn.circle     integer NA               NA                                      Turning circle     "\"typ… TRUE    feet  <chr>
+13 Rear.seat.room  numeric NA               NA                                      Rear seat room     "\"typ… FALSE   inch… <chr>
+14 Luggage.room    integer NA               NA                                      Luggage room       "\"typ… FALSE   cubi… <chr>
+# … with abbreviated variable names ¹​json_expr, ²​required
+
+```
+
+</details>
+
 ### Creating of JSON Schemas for data frame validation
 
 <details>

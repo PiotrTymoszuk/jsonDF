@@ -106,7 +106,25 @@
 #' @rdname documentation
 #' @export
 
-  is_documentation <- function(x) inherits(x, 'documentation')
+  is_documentation <- function(x) {
+
+    ## class compatibility
+
+    class_ok <- inherits(x, 'documentation')
+
+    ## format compatibility
+
+    format_ok <-
+      all(c('variable',
+            'enumeration',
+            'coding',
+            'description',
+            'json_expr',
+            'required') %in% names(x))
+
+    return(class_ok & format_ok)
+
+  }
 
 # `schema_sting` class --------
 

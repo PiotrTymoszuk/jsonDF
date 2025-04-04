@@ -44,6 +44,8 @@
 
   documentation <- function(x, ...) {
 
+    if(is_documentation(x)) return(x)
+
     ## input control -------
 
     if(!is.data.frame(x)) stop("'x' has to be a data frame", call. = FALSE)
@@ -264,8 +266,7 @@
 
     ## structure ---------
 
-    structure(x,
-              class = 'schema')
+    structure(x, class = 'schema')
 
   }
 
@@ -333,6 +334,8 @@
 #' @param ... extra arguments, currently none.
 
   renDoc <- function(x, ...) {
+
+    if(is_renDoc(x)) return(x)
 
     ## entry control -------
 

@@ -55,12 +55,13 @@
 #' header; usually a short description of a table or a project
 #' @param description_extras names of the documentation columns to be included
 #' in the variable description (`description` keyword value for variable
-#' properties).
+#' properties). At the moment variable tags (`tags` column of documentation)
+#' will not included in the schema, event if listed here.
 #' @param extras_keywords logical, should the documentation columns specified
 #' by `description_extras` be included as separate keywords tethered to the
 #' variable's properties? Defaults to `FALSE`, which means that content of such
 #' column will be pasted with the description after the `|` separator. Please
-#' note that extra keywords in variable are not necassarily compatible with
+#' note that extra keywords in variable are not necessarily compatible with
 #' standard JSON Schema syntax without declaration of meta-data dictionaries.
 #' For discussion, see:
 #' https://json-schema.org/understanding-json-schema/reference/schema#guidelines
@@ -159,7 +160,8 @@
                         'enumeration',
                         'description',
                         'json_expr',
-                        'required')
+                        'required',
+                        'tags')
 
       description_extra <- setdiff(description_extras, default_keys)
 

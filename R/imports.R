@@ -5,6 +5,9 @@
 #' @importFrom dplyr arrange
 #' @importFrom dplyr filter
 #'
+#' @importFrom tibble is_tibble
+#' @importFrom tibble as_tibble
+#'
 #' @importFrom readr write_file
 #'
 #' @importFrom purrr map
@@ -25,6 +28,7 @@
 #' @importFrom stringi stri_split_regex
 #'
 #' @importFrom rlang set_names
+#' @importFrom rlang list2
 #'
 #' @importFrom jsonlite parse_json
 #' @importFrom jsonlite write_json

@@ -63,6 +63,20 @@
 
     x <- x[variables]
 
+    ## only atomic-type variables can be characterized
+
+    atomic_vars <- map_lgl(x, is.atomic)
+
+    x <- x[, atomic_vars]
+    variables <- variables[atomic_vars]
+
+    if(!all(atomic_vars)) {
+
+      warning("Non-atomic variables in 'x' will be ignored",
+              call. = FALSE)
+
+    }
+
     var_classes <- map_chr(x, ~class(.x)[[1]])
 
     x <-
@@ -258,6 +272,19 @@
     if(!is.numeric(enum_limit)) {
 
       stop("'enum_limit' has to be a numeric value.", call. = FALSE)
+
+    }
+
+    ## selection of atomic type variables ------
+
+    atomic_vars <- map_lgl(x, is.atomic)
+
+    x <- x[, atomic_vars]
+
+    if(!all(atomic_vars)) {
+
+      warning("Non-atomic variables in 'x' will be ignored",
+              call. = FALSE)
 
     }
 

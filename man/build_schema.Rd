@@ -54,13 +54,14 @@ header; usually a short description of a table or a project}
 
 \item{description_extras}{names of the documentation columns to be included
 in the variable description (\code{description} keyword value for variable
-properties).}
+properties). At the moment variable tags (\code{tags} column of documentation)
+will not included in the schema, event if listed here.}
 
 \item{extras_keywords}{logical, should the documentation columns specified
 by \code{description_extras} be included as separate keywords tethered to the
 variable's properties? Defaults to \code{FALSE}, which means that content of such
 column will be pasted with the description after the \code{|} separator. Please
-note that extra keywords in variable are not necassarily compatible with
+note that extra keywords in variable are not necessarily compatible with
 standard JSON Schema syntax without declaration of meta-data dictionaries.
 For discussion, see:
 https://json-schema.org/understanding-json-schema/reference/schema#guidelines}

@@ -26,4 +26,5 @@ Imports:
     purrr,
     readr,
     rlang,
-    stringi
+    stringi,
+    tibble

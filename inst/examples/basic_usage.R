@@ -122,6 +122,54 @@
 
   car_coding_scheme[1:15, ]
 
+# Tags of the variables -------
+
+  ## adding variable tags
+
+  car_documentation <- car_documentation %>%
+    add_tags(tags = 'root tag') %>%
+    add_tags(tags = c('price', 'affordability'),
+             stri_detect(variable, regex = 'Price$')) %>%
+    add_tags(tags = c('economics', 'affordability'),
+             stri_detect(variable, regex = '^MPG')) %>%
+    add_tags(tags = c('characteristic', 'dimensions'),
+             variable %in% c('Passengers',
+                             'Length',
+                             'Width',
+                             'Wheelbase',
+                             'Turn.circle',
+                             'Luggage.room',
+                             'Rear.seat.room')) %>%
+    add_tags(tags = c('characteristic', 'drive'),
+             variable %in% c('DriveTrain',
+                             'Cylinders',
+                             'EngineSize',
+                             'Horsepower',
+                             'RPM',
+                             'Rev.per.mile',
+                             'Man.trans.avail'))
+
+  ## and removing them for selected variables
+
+  car_documentation %>% show_tags
+
+  car_documentation <- car_documentation %>%
+    delete_tags(tags = 'root tag',
+                variable %in% c('ID', 'Type'))
+
+  ## filtering by tags
+
+  car_documentation %>%
+    filter_tags(tags = c('characteristic', 'drive'),
+                mode = 'all') %>%
+    show_tags
+
+  car_documentation %>%
+    filter_tags(tags = c('characteristic', 'drive'),
+                mode = 'any') %>%
+    show_tags
+
+
 # Construction of JSON Schemas -----
 
   ## creating JSON Schemas as 'schema' objects and plain strings
@@ -161,8 +209,6 @@
    # write_schema('car_json_schema.json')
 
 # JSON files from data frames ----------
-
-  #plan('multisession')
 
   ## a JSON data list with factors coded as integers
 

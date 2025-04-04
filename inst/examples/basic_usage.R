@@ -115,8 +115,10 @@
 
   ## creating a coding scheme/list-of-values
 
-  car_coding_scheme <- my_cars %>%
+  car_coding_scheme <- car_documentation %>%
     create_coding
+
+  car_coding_scheme[1:15, ]
 
 # Construction of JSON Schemas -----
 

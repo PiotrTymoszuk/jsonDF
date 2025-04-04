@@ -280,7 +280,7 @@ Such ready-to-use lists of values can be easily extracted from `documentation` o
 
 ```r
 
-  car_coding_scheme <- my_cars %>%
+   car_coding_scheme <- car_documentation %>% 
       create_coding
 
 ```
@@ -289,23 +289,24 @@ Such ready-to-use lists of values can be easily extracted from `documentation` o
 > car_coding_scheme[1:15, ]
 
 # A tibble: 15 × 4
-   variable   description value label             
-   <fct>      <chr>       <chr> <chr>             
- 1 Type       Type        1     Compact           
- 2 Type       Type        2     Large             
- 3 Type       Type        3     Midsize           
- 4 Type       Type        4     Small             
- 5 Type       Type        5     Sporty            
- 6 Type       Type        6     Van               
- 7 AirBags    AirBags     1     Driver & Passenger
- 8 AirBags    AirBags     2     Driver only       
- 9 AirBags    AirBags     3     None              
-10 DriveTrain DriveTrain  1     4WD               
-11 DriveTrain DriveTrain  2     Front             
-12 DriveTrain DriveTrain  3     Rear              
-13 Cylinders  Cylinders   1     3                 
-14 Cylinders  Cylinders   2     4                 
-15 Cylinders  Cylinders   3     5    
+   variable   description                                        value label             
+   <fct>      <chr>                                              <chr> <chr>             
+ 1 Type       Classification of the car as compact, middle, etc. 1     Compact           
+ 2 Type       Classification of the car as compact, middle, etc. 2     Large             
+ 3 Type       Classification of the car as compact, middle, etc. 3     Midsize           
+ 4 Type       Classification of the car as compact, middle, etc. 4     Small             
+ 5 Type       Classification of the car as compact, middle, etc. 5     Sporty            
+ 6 Type       Classification of the car as compact, middle, etc. 6     Van               
+ 7 AirBags    Airbag location and numeber                        1     Driver & Passenger
+ 8 AirBags    Airbag location and numeber                        2     Driver only       
+ 9 AirBags    Airbag location and numeber                        3     None              
+10 DriveTrain Drive transmission                                 1     4WD               
+11 DriveTrain Drive transmission                                 2     Front             
+12 DriveTrain Drive transmission                                 3     Rear              
+13 Cylinders  Cylinder number and assembly                       1     3                 
+14 Cylinders  Cylinder number and assembly                       2     4                 
+15 Cylinders  Cylinder number and assembly                       3     5     
+
 ```
 
 </details>

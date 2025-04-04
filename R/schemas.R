@@ -17,6 +17,24 @@
 #' Those objects can be saved as JSON files on the disc with
 #' \code{\link{write_schema}}.
 #'
+#' Please note, that the output of `build_schema()` function provides only the
+#' core validation functionality and does not allow for generation dependent
+#' requirements or dependent schemas (sub-schemas) - because this information
+#' cannot be extracted from a plain data frame.
+#' Such extra validation statements may be specified via `tail_statement`
+#' argument.
+#'
+#' By specifying `description_extras`, the user may include additional columns
+#' from the documentation in the JSON Schema.
+#' If `extras_keywords = FALSE`, this extra portion information will be pasted
+#' with the `description` keyword with the `|` separator.
+#' If `extras_keywords = TRUE`, the additional columns, if not empty, will be
+#' included in the schema as additional keywords under `property` key of the
+#' variables.
+#' Please note that such custom keywords may not be automatically recognized
+#' by standard JSON Schema validators.
+#' See: https://json-schema.org/understanding-json-schema/reference/schema#guidelines
+#'
 #'
 #' @return a string of class \code{\link{schema_string}} with the JSON Schema
 #' structure (`as_schema = FALSE`) or a \code{\link{schema}} class object
@@ -37,8 +55,19 @@
 #' header; usually a short description of a table or a project
 #' @param description_extras names of the documentation columns to be included
 #' in the variable description (`description` keyword value for variable
-#' properties). Content of such column will be included in the description after
-#' the `|` separator.
+#' properties).
+#' @param extras_keywords logical, should the documentation columns specified
+#' by `description_extras` be included as separate keywords tethered to the
+#' variable's properties? Defaults to `FALSE`, which means that content of such
+#' column will be pasted with the description after the `|` separator. Please
+#' note that extra keywords in variable are not necassarily compatible with
+#' standard JSON Schema syntax without declaration of meta-data dictionaries.
+#' For discussion, see:
+#' https://json-schema.org/understanding-json-schema/reference/schema#guidelines
+#' @param tail_statements an optional character string that specifies additional
+#' validation keywords and their values such as
+#' [dependent requirements](https://json-schema.org/understanding-json-schema/reference/conditionals#dependentRequired)
+#' or [dependent schemas](https://json-schema.org/understanding-json-schema/reference/conditionals#dependentSchemas)
 #' @param as_schema logical, should a `schema` class object be returned?
 #' See Details.
 #' @param ... extra arguments passed to the methods; in case of `data.frame`
@@ -58,6 +87,8 @@
              title_key = NULL,
              description_key = NULL,
              description_extras = 'coding',
+             extras_keywords = FALSE,
+             tail_statements = NULL,
              as_schema = FALSE, ...) {
 
       ## input control -------
@@ -86,6 +117,20 @@
 
       }
 
+      if(!is.null(tail_statements)) {
+
+        if(!is.character(tail_statements)) {
+
+          stop("'tail_statements' needs to be a character string",
+               call. = FALSE)
+
+        }
+
+        tail_statements <- tail_statements[1]
+
+      }
+
+      stopifnot(is.logical(extras_keywords))
       stopifnot(is.logical(as_schema))
 
       ## JSON schema header -----
@@ -110,15 +155,39 @@
 
       ## collapsing the description fields -------
 
+      default_keys <- c('variable',
+                        'enumeration',
+                        'description',
+                        'json_expr',
+                        'required')
+
+      description_extra <- setdiff(description_extras, default_keys)
+
       if(length(description_extras) > 0) {
 
-        for(i in description_extras) {
+        if(!extras_keywords) {
 
-          x[['description']] <-
-            ifelse(x[[i]] == '' | is.na(x[[i]]),
-                   x[['description']],
-                   paste0(x[['description']],
-                          '|', i, ': ', x[[i]]))
+          for(i in description_extras) {
+
+            x[['description']] <-
+              ifelse(x[[i]] == '' | is.na(x[[i]]),
+                     x[['description']],
+                     paste0(x[['description']],
+                            '|', i, ': ', x[[i]]))
+
+          }
+
+        } else {
+
+          for(i in description_extras) {
+
+            x[['json_expr']] <-
+              ifelse(x[[i]] == '' | is.na(x[[i]]),
+                     x[['json_expr']],
+                     paste0(x[['json_expr']],
+                            ', "', i, '": "', x[[i]], '"'))
+
+          }
 
         }
 
@@ -171,11 +240,19 @@
 
       }
 
+      ## optional tail statements -------
+
+      if(!is.null(tail_statements)) {
+
+        json_str <- paste(json_str, tail_statements, sep = ', ')
+
+      }
+
+      ## output ----------
+
       json_str  <- paste0('{', json_str, '}')
 
       json_str <- schema_string(json_str)
-
-      ## output ----------
 
       if(!as_schema) return(json_str)
 
@@ -193,6 +270,8 @@
              title_key = NULL,
              description_key = NULL,
              description_extras = 'coding',
+             extras_keywords = FALSE,
+             tail_statements = NULL,
              as_schema = FALSE, ...) {
 
       ## input controls: most is done by the downstream function ------
@@ -213,6 +292,8 @@
                    title_key = title_key,
                    description_key = description_key,
                    description_extras = description_extras,
+                   extras_keywords = extras_keywords,
+                   tail_statements = tail_statements,
                    as_schema = as_schema, ...)
 
     }

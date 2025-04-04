@@ -15,6 +15,8 @@ build_schema(x, ...)
   title_key = NULL,
   description_key = NULL,
   description_extras = "coding",
+  extras_keywords = FALSE,
+  tail_statements = NULL,
   as_schema = FALSE,
   ...
 )
@@ -26,6 +28,8 @@ build_schema(x, ...)
   title_key = NULL,
   description_key = NULL,
   description_extras = "coding",
+  extras_keywords = FALSE,
+  tail_statements = NULL,
   as_schema = FALSE,
   ...
 )
@@ -50,8 +54,21 @@ header; usually a short description of a table or a project}
 
 \item{description_extras}{names of the documentation columns to be included
 in the variable description (\code{description} keyword value for variable
-properties). Content of such column will be included in the description after
-the \code{|} separator.}
+properties).}
+
+\item{extras_keywords}{logical, should the documentation columns specified
+by \code{description_extras} be included as separate keywords tethered to the
+variable's properties? Defaults to \code{FALSE}, which means that content of such
+column will be pasted with the description after the \code{|} separator. Please
+note that extra keywords in variable are not necassarily compatible with
+standard JSON Schema syntax without declaration of meta-data dictionaries.
+For discussion, see:
+https://json-schema.org/understanding-json-schema/reference/schema#guidelines}
+
+\item{tail_statements}{an optional character string that specifies additional
+validation keywords and their values such as
+\href{https://json-schema.org/understanding-json-schema/reference/conditionals#dependentRequired}{dependent requirements}
+or \href{https://json-schema.org/understanding-json-schema/reference/conditionals#dependentSchemas}{dependent schemas}}
 
 \item{as_schema}{logical, should a \code{schema} class object be returned?
 See Details.}
@@ -72,6 +89,24 @@ object generated from the JSON Schema string. Otherwise a plain string of
 class \code{\link{schema_string}} is returned.
 Those objects can be saved as JSON files on the disc with
 \code{\link{write_schema}}.
+
+Please note, that the output of \code{build_schema()} function provides only the
+core validation functionality and does not allow for generation dependent
+requirements or dependent schemas (sub-schemas) - because this information
+cannot be extracted from a plain data frame.
+Such extra validation statements may be specified via \code{tail_statement}
+argument.
+
+By specifying \code{description_extras}, the user may include additional columns
+from the documentation in the JSON Schema.
+If \code{extras_keywords = FALSE}, this extra portion information will be pasted
+with the \code{description} keyword with the \code{|} separator.
+If \code{extras_keywords = TRUE}, the additional columns, if not empty, will be
+included in the schema as additional keywords under \code{property} key of the
+variables.
+Please note that such custom keywords may not be automatically recognized
+by standard JSON Schema validators.
+See: https://json-schema.org/understanding-json-schema/reference/schema#guidelines
 }
 \examples{
 car_documentation <- create_doc(my_cars)

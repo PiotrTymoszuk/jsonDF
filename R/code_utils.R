@@ -174,7 +174,7 @@
       map2(sub_headers, body_paras,
            paste, sep = '\n')
 
-    code_body <- paste(code_body, collapse = '\n\n')
+    code_body <- paste(code_body, collapse = '\n\n\n')
 
     ## the output string -------
 

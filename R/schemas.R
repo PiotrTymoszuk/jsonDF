@@ -366,17 +366,17 @@
 #' @return returns invisibly the path to the JSON file.
 #'
 #' @param x a \code{\link{schema_string}} or \code{\link{schema}} object.
-#' @param path a path to the file.
+#' @param file a path to the file or a connection.
 #' @param ... extra arguments passed to the methods.
 #'
 #' @export
 
-  write_schema <- function(x, path, ...) UseMethod('write_schema')
+  write_schema <- function(x, file, ...) UseMethod('write_schema')
 
 #' @rdname write_schema
 #' @export
 
-  write_schema.schema_string <- function(x, path, ...) {
+  write_schema.schema_string <- function(x, file, ...) {
 
     if(!is_schema_string(x)) {
 
@@ -384,29 +384,31 @@
 
     }
 
-    stopifnot(is.character(path))
+    if(is.character(file)) {
 
-    if(!stri_detect(path, regex = '\\.json$')) {
+      if(!stri_detect(file, regex = '\\.json$')) {
 
-      warning("The path specified by 'path' does not refer to a JSON file",
-              call. = FALSE)
+        warning("The path specified by 'file' does not refer to a JSON file",
+                call. = FALSE)
+
+      }
 
     }
 
-    write_file(unclass(x), file = path)
+    write_file(unclass(x), file = file)
 
-    invisible(path)
+    invisible(file)
 
   }
 
 #' @rdname write_schema
 #' @export
 
-  write_schema.schema <- function(x, path, ...) {
+  write_schema.schema <- function(x, file, ...) {
 
     json_str <- schema2string(x)
 
-    write_schema(json_str, path)
+    write_schema(json_str, file)
 
   }
 

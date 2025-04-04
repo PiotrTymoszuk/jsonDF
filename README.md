@@ -132,9 +132,13 @@ The function's output is a data frame of class `documentation` with the followin
 
 * `json_expr`: basic validation rules for the variable compatible with syntax of [JSON Schema](https://json-schema.org/)
 
-* `required`: a logical value indicating if the variable is required or can be left as NA. By default none of the variables is required
+* `required`: a logical value indicating if the variable is required or can be left as NA. By default 100% complete vairables re set as required
 
-Of note, the documentation object can be modified by the user by adding extra columns or modification of the columns outlined above. 
+Of note, the `documentation` object can be modified by the user by adding extra columns or modification of the columns outlined above. 
+Because the `documentation` object is just a  data frame, it can be conveniently manipulated by `tidyverse` tools such as `mutate()`. 
+In particular, the user may intend to enrich the variable description by modifying the `coding` column, include a column with human-friendly variable labels to be presented in dashboards or applications, or choosing the required variables by altering the `required` column. 
+Advanced users may narrow down the validity criteria for the variables in the `json_expr` column by modifying, adding or removing keywords according to [the JSON Schema syntax](https://json-schema.org/understanding-json-schema/keywords). 
+
 In the example below, we'll create documentation of the `my_cars` data set and enrich it by providing human-friendly descriptions and information on units. 
 By setting `enum_limit = 7`, we intend to treat character and numeric features with no more than seven unique values as enumerated features. 
 `json_date = 'date-time'` makes the date to be [ISO 8601 compliant](https://www.iso.org/iso-8601-date-and-time-format.html). 
@@ -158,7 +162,7 @@ By specifying `json_num_range = TRUE`, we insert the ranges of numeric variables
                          'Max.Price' = 'Maximum price';
                          'MPG.city' = 'Mileage in city traffic';
                          'MPG.highway' = 'Mileage in highway traffic';
-                         'AirBags' = 'Airbag location and numeber';
+                         'AirBags' = 'Airbag location and number';
                          'DriveTrain' = 'Drive transmission';
                          'Cylinders' = 'Cylinder number and assembly';
                          'EngineSize' = 'Engine volume';
@@ -297,9 +301,9 @@ Such ready-to-use lists of values can be easily extracted from `documentation` o
  4 Type       Classification of the car as compact, middle, etc. 4     Small             
  5 Type       Classification of the car as compact, middle, etc. 5     Sporty            
  6 Type       Classification of the car as compact, middle, etc. 6     Van               
- 7 AirBags    Airbag location and numeber                        1     Driver & Passenger
- 8 AirBags    Airbag location and numeber                        2     Driver only       
- 9 AirBags    Airbag location and numeber                        3     None              
+ 7 AirBags    Airbag location and number                        1     Driver & Passenger
+ 8 AirBags    Airbag location and number                        2     Driver only       
+ 9 AirBags    Airbag location and number                        3     None              
 10 DriveTrain Drive transmission                                 1     4WD               
 11 DriveTrain Drive transmission                                 2     Front             
 12 DriveTrain Drive transmission                                 3     Rear              
@@ -315,7 +319,122 @@ Such ready-to-use lists of values can be easily extracted from `documentation` o
 
 <details>
 
+[JSON Schema](https://json-schema.org/) is gaining popularity as a standard for validation of information dispatched as JSON objects. 
+Because of their flexibility and comprehensive content of information required for validation, they pose also an interesting alternative as a metadata storage format. 
 
+Our `jsonDF` package provides a function named `build_schema()` which allows for seamless conversion of `documentation` objects that store data frame metadata to JSON Schemas. 
+Please note, that this functionality generates relatively simple JSON Schemes with validation rules applying independently for each variable and information on required variables. 
+Relative and conditional validation rules are not derived directly from the data frame and are hence not automatically included in the output of `build_schema()` function.   
+
+In the example below, we generate a hierarchical JSON Schema object (`as_schema = TRUE`) and a JSON Schema string (`as_schema = FALSE`) for the documentation of `my_cars` data set. 
+Via `id_key`, we can provide an identifier of the data set, or, as required for advanced validation options, a schema or sub-schema identifier stored in the `$id` keyword (see: [Modular JSON Schema combination](https://json-schema.org/understanding-json-schema/structuring)). 
+With `title_key` and `description_key`, we can assign a title and description to the schema. 
+With `description_extras`, we can specify extra information from the documentation to be include in the schema; in this particular example, we want to have information on coding and unit pasted together with the variable description. 
+
+```r
+
+  schema_json <- car_documentation %>%
+    build_schema(as_schema = TRUE,
+                 id_key = 'my_cars',
+                 title_key = 'MyCars Data Set',
+                 description_key = paste('Meta-data and validation rules for',
+                                         'variables in the MyCars data set'),
+                 description_extras = c('coding', 'unit'))
+
+  schema_string <- car_documentation %>%
+    build_schema(description_extras = c('coding', 'unit'))
+
+```
+
+```
+> schema_json %>% str
+
+List of 7
+ $ $schema    : chr "http://json-schema.org/draft-07/schema#"
+ $ $id        : chr ""
+ $ title      : chr ""
+ $ description: chr ""
+ $ type       : chr "object"
+ $ properties :List of 31
+  ..$ ID                :List of 2
+  .. ..$ type       : chr "string"
+  .. ..$ description: chr "Unique identifier of the car"
+  ..$ Manufacturer      :List of 2
+  .. ..$ type       : chr "string"
+  .. ..$ description: chr "Manufacturer of the car"
+  ..$ Model             :List of 2
+  .. ..$ type       : chr "string"
+  .. ..$ description: chr "Car model"
+  ..$ Type              :List of 3
+  .. ..$ type       : chr "integer"
+  .. ..$ enum       : int [1:6] 1 2 3 4 5 6
+  .. ..$ description: chr "Classification of the car as compact, middle, etc.|coding: 1: Compact; 2: Large; 3: Midsize; 4: Small; 5: Sporty; 6: Van"
+
+```
+
+If intended, additional information can be tethered to variable properties as cutrom keywords as demonstrated below. Please note, that such 'non-standard' schemas may require definition of meta-data dictionaries or configuration of validators to function properly (see: [Vocabularies](https://json-schema.org/understanding-json-schema/reference/schema#guidelines)). 
+
+```r 
+
+  ## 'schema' object with extra 'coding' and 'unit' keywords
+  ## by turning 'extras_keywords = TRUE'
+
+  schema_json_extended <- car_documentation %>%
+    build_schema(as_schema = TRUE,
+                 id_key = 'my_cars',
+                 title_key = 'MyCars Data Set',
+                 description_key = paste('Meta-data and validation rules for',
+                                         'variables in the MyCars data set'),
+                 description_extras = c('coding', 'unit'),
+                 extras_keywords = TRUE)
+
+```
+
+```
+>   schema_json_extended$properties$Price
+
+$type
+[1] "number"
+
+$minimum
+[1] 7.4
+
+$maximum
+[1] 61.9
+
+$unit
+[1] "dollars"
+
+$description
+[1] "Average price"
+
+```
+```
+>   schema_json_extended$properties$AirBags
+
+$type
+[1] "integer"
+
+$enum
+[1] 1 2 3
+
+$coding
+[1] "1: Driver & Passenger; 2: Driver only; 3: None"
+
+$description
+[1] "Airbag location and number"
+
+```
+
+Finally, with `write_schema()`, the JSON Schema can by saved on a disc. 
+
+```r
+
+  schema_json %>%
+      write_schema('car_json_schema.json')
+
+```
+<img src="inst/screenshots/json_schema.PNG" style="width: 75%;" alt="JSON Schema">
 
 </details>
 

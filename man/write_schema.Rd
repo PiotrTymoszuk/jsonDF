@@ -6,16 +6,16 @@
 \alias{write_schema.schema}
 \title{Writing JSON Schemas on the disc.}
 \usage{
-write_schema(x, path, ...)
+write_schema(x, file, ...)
 
-\method{write_schema}{schema_string}(x, path, ...)
+\method{write_schema}{schema_string}(x, file, ...)
 
-\method{write_schema}{schema}(x, path, ...)
+\method{write_schema}{schema}(x, file, ...)
 }
 \arguments{
 \item{x}{a \code{\link{schema_string}} or \code{\link{schema}} object.}
 
-\item{path}{a path to the file.}
+\item{file}{a path to the file or a connection.}
 
 \item{...}{extra arguments passed to the methods.}
 }

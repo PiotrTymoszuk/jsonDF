@@ -44,7 +44,7 @@
                          'Max.Price' = 'Maximum price';
                          'MPG.city' = 'Mileage in city traffic';
                          'MPG.highway' = 'Mileage in highway traffic';
-                         'AirBags' = 'Airbag location and numeber';
+                         'AirBags' = 'Airbag location and number';
                          'DriveTrain' = 'Drive transmission';
                          'Cylinders' = 'Cylinder number and assembly';
                          'EngineSize' = 'Engine volume';
@@ -102,16 +102,18 @@
                subtitle = 'Variable lexicon',
                type = 'markdown',
                sep = '<hr>',
-               heading_levels = c(2, 3),
-               file = 'variable_lexicon.md')
+               heading_levels = c(2, 3)#,
+               #file = 'variable_lexicon.md'
+               )
 
   car_documentation %>%
     toDocument(title = 'Documentation of MyCars data set',
                subtitle = 'Variable lexicon',
                type = 'html',
                sep = '<hr>',
-               heading_levels = c(2, 3),
-               file = 'variable_lexicon.html')
+               heading_levels = c(2, 3)#,
+               #file = 'variable_lexicon.html'
+               )
 
   ## creating a coding scheme/list-of-values
 
@@ -122,19 +124,41 @@
 
 # Construction of JSON Schemas -----
 
-  ## creating
+  ## creating JSON Schemas as 'schema' objects and plain strings
 
   schema_json <- car_documentation %>%
     build_schema(as_schema = TRUE,
+                 id_key = 'my_cars',
+                 title_key = 'MyCars Data Set',
+                 description_key = paste('Meta-data and validation rules for',
+                                         'variables in the MyCars data set'),
                  description_extras = c('coding', 'unit'))
 
   schema_string <- car_documentation %>%
     build_schema(description_extras = c('coding', 'unit'))
 
+  schema_json %>%
+    str
+
+  ## 'schema' object with extra 'coding' and 'unit' keywords
+  ## by turning 'extras_keywords = TRUE'
+
+  schema_json_extended <- car_documentation %>%
+    build_schema(as_schema = TRUE,
+                 id_key = 'my_cars',
+                 title_key = 'MyCars Data Set',
+                 description_key = paste('Meta-data and validation rules for',
+                                         'variables in the MyCars data set'),
+                 description_extras = c('coding', 'unit'),
+                 extras_keywords = TRUE)
+
   ## saving a JSON files with the Schema
 
   schema_json %>%
     write_schema('./inst/json_schemas/car_json_schema.json')
+
+  #schema_json %>%
+   # write_schema('car_json_schema.json')
 
 # JSON files from data frames ----------
 

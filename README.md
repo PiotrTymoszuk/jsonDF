@@ -447,7 +447,33 @@ This is illustrated for searching the documentation of `my_cars`:
 # … with abbreviated variable names ¹​json_expr, ²​required
 
 ```
+We can also append the documentation with one or multiple columns with variable classification labels based on the tags by calling `expand_tags()`for the documentation object. 
+The tags of interest are provided as a character vector via the `tags` argument. 
+If these tags are exclusive and `one_column = TRUE`, a single column named `tag_class` is added to the documentation data frame as in the example below for non-overlapping tags `'drive'`, `'price'`, and `'dimensions'`: 
 
+```
+>   car_documentation %>% 
++     expand_tags(tags = c('price', 'drive', 'dimensions'), 
++                 one_column = TRUE) %>% 
++     select(variable, tag_class)
+
+# A tibble: 31 × 2
+   variable     tag_class
+   <chr>        <fct>    
+ 1 ID           other    
+ 2 Manufacturer other    
+ 3 Model        other    
+ 4 Type         other    
+ 5 Min.Price    price    
+ 6 Price        price    
+ 7 Max.Price    price    
+ 8 MPG.city     other    
+ 9 MPG.highway  other    
+10 AirBags      other    
+# … with 21 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+```
 </details>
 
 ### Creating of JSON Schemas for data frame validation

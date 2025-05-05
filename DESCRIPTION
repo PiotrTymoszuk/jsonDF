@@ -2,7 +2,7 @@ Package: jsonDF
 Type: Package
 Title: Conversions Between R Data Frames, JSON Schemas, JSON data files, 
     and SQL code
-Version: 1.2.0
+Version: 1.2.1
 Authors@R: c(
     person("Piotr", "Tymoszuk", , "piotr.s.tymoszuk@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0398-6034"))
@@ -27,4 +27,5 @@ Imports:
     readr,
     rlang,
     stringi,
-    tibble
+    tibble,
+    utils

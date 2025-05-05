@@ -5,6 +5,7 @@
 \alias{add_tags}
 \alias{delete_tags}
 \alias{filter_tags}
+\alias{expand_tags}
 \title{Display, add, remove, and search variable tags in data frame documentation.}
 \usage{
 show_tags(x, ...)
@@ -14,6 +15,8 @@ add_tags(x, tags, ...)
 delete_tags(x, tags, ...)
 
 filter_tags(x, tags, mode = c("any", "all"))
+
+expand_tags(x, tags, one_column = FALSE)
 }
 \arguments{
 \item{x}{a \code{documentation} object.}
@@ -24,7 +27,10 @@ the \code{documentation} object. See \code{\link[dplyr]{filter}} for details.}
 \item{tags}{a character vector with the tags.}
 
 \item{mode}{full-text search mode for filtering variable tags.
-See \strong{Details}.}
+See the \strong{Details}.}
+
+\item{one_column}{should names of exclusive tags be placed in one column?
+See the \strong{Details}.}
 }
 \value{
 a \code{\link{documentation}} object with column \code{tags} storing
@@ -40,6 +46,8 @@ conditions.
 For details on storage and modification of tags, please refer to \strong{Details}.
 
 \code{filter_tags()} filters the documentation object by presence of tags.
+\code{expand_tags()} expands tags of the documentation object into one or more
+separate columns as described in \strong{Details}.
 }
 \details{
 Technically, tags are stored as a list of character vectors in the \code{tags}
@@ -53,8 +61,15 @@ If no statements are provided to \code{...}, all tags in the \code{documentation
 object are displayed or altered.
 
 \code{filter_tags()} executes full-text search for tags.
-If \code{mode = 'any'}, rows are returned, where any of the searching tags
+If \code{mode = 'any'}, the rows are returned, where any of the searching tags
 specified by \code{tags} matches the vaiable tags.
 If \code{mode = 'all'}, a full march between the \code{tags} argument and the variable
 tags is expected.
+
+\code{expand_tags()} converts the tags in a documentation object specified by
+\code{tags} argument into one or more columns named after these tags of interest.
+if \code{one_column = FALSE} each of these columns contains \code{TRUE/FALSE} logical
+values indicating for the tag presence.
+if \code{one_column = TRUE} and the tags of interest are exclusive, one character
+column \code{tag_class} with the tag names is added.
 }

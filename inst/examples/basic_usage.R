@@ -169,6 +169,13 @@
                 mode = 'any') %>%
     show_tags
 
+  ## adding a classification column with exclusive tags
+  ## 'price', 'drive', 'dimensions'
+
+  car_documentation %>%
+    expand_tags(tags = c('price', 'drive', 'dimensions'),
+                one_column = TRUE) %>%
+    select(variable, tag_class)
 
 # Construction of JSON Schemas -----
 
